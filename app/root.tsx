@@ -8,6 +8,24 @@ import {
 import type { LinksFunction } from "@remix-run/node";
 
 import "./tailwind.css";
+import '@syncfusion/ej2-base/styles/material.css';
+import '@syncfusion/ej2-buttons/styles/material.css';
+import '@syncfusion/ej2-calendars/styles/material.css';
+import '@syncfusion/ej2-dropdowns/styles/material.css';
+import '@syncfusion/ej2-inputs/styles/material.css';
+import '@syncfusion/ej2-lists/styles/material.css';
+import '@syncfusion/ej2-navigations/styles/material.css';
+import '@syncfusion/ej2-popups/styles/material.css';
+import '@syncfusion/ej2-react-schedule/styles/material.css';
+
+//import the loadCldr from ej2-base
+import { loadCldr} from '@syncfusion/ej2-base';
+import ptNumberData from '@syncfusion/ej2-cldr-data/main/pt/numbers.json';
+import pttimeZoneData from '@syncfusion/ej2-cldr-data/main/pt/timeZoneNames.json';
+import ptGregorian from '@syncfusion/ej2-cldr-data/main/pt/ca-gregorian.json';
+import ptNumberingSystem from '@syncfusion/ej2-cldr-data/supplemental/numberingSystems.json';
+
+loadCldr(ptNumberData, pttimeZoneData, ptGregorian, ptNumberingSystem);
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },

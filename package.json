@@ -11,9 +11,15 @@
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@prisma/client": "^5.22.0",
     "@remix-run/node": "^2.15.0",
     "@remix-run/react": "^2.15.0",
     "@remix-run/serve": "^2.15.0",
+    "@syncfusion/ej2-cldr-data": "^26.1.35",
+    "@syncfusion/ej2-react-buttons": "^27.2.4",
+    "@syncfusion/ej2-react-grids": "^27.2.4",
+    "@syncfusion/ej2-react-schedule": "^27.2.3",
+    "@zenstackhq/runtime": "2.9.4",
     "isbot": "^4.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
@@ -32,10 +38,12 @@
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "postcss": "^8.4.38",
+    "prisma": "^5.22.0",
     "tailwindcss": "^3.4.4",
     "typescript": "^5.1.6",
     "vite": "^5.1.0",
-    "vite-tsconfig-paths": "^4.2.1"
+    "vite-tsconfig-paths": "^4.2.1",
+    "zenstack": "2.9.4"
   },
   "engines": {
     "node": ">=20.0.0"
