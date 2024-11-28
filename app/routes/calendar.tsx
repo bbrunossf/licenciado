@@ -3,7 +3,7 @@
 //import entimeZoneData from "@syncfusion/ej2-cldr-data/main/en/timeZoneNames.json";
 //import {setCulture, setCurrencyCode} from '@syncfusion/ej2-base';
 
-import { ButtonComponent } from "@syncfusion/ej2-react-buttons";
+//import { ButtonComponent } from "@syncfusion/ej2-react-buttons";
 import {loadCldr, L10n, setCulture} from "@syncfusion/ej2-base";
 import { json, type LoaderFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
