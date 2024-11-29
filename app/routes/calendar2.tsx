@@ -9,7 +9,7 @@ import {
   Month, 
   Agenda, 
   Inject,
-  DialogModule,
+  //DialogModule,
   DragAndDrop,
   Resize
 } from '@syncfusion/ej2-react-schedule';
@@ -19,7 +19,7 @@ import { PrismaClient } from '@prisma/client';
 
 export const loader = async () => {
   const prisma = new PrismaClient();
-  const events = await prisma.event.findMany();
+  const events = await prisma.evento.findMany();
   return json(events);
 };
 
@@ -30,7 +30,7 @@ export const action = async ({ request }) => {
 
   switch (eventData.actionType) {
     case 'create':
-      const newEvent = await prisma.event.create({
+      const newEvent = await prisma.evento.create({
         data: {
           title: eventData.Subject,
           start: new Date(eventData.StartTime),
@@ -42,7 +42,7 @@ export const action = async ({ request }) => {
       return json(newEvent);
 
     case 'update':
-      const updatedEvent = await prisma.event.update({
+      const updatedEvent = await prisma.evento.update({
         where: { id: eventData.Id },
         data: {
           title: eventData.Subject,
@@ -55,7 +55,7 @@ export const action = async ({ request }) => {
       return json(updatedEvent);
 
     case 'delete':
-      const deletedEvent = await prisma.event.delete({
+      const deletedEvent = await prisma.evento.delete({
         where: { id: eventData.Id }
       });
       return json(deletedEvent);
@@ -86,7 +86,7 @@ export default function Scheduler() {
       }
 
       // Send to action route
-      await fetch('/scheduler', {
+      await fetch('/calendar2', {
         method: 'POST',
         body: formData
       });
@@ -110,9 +110,9 @@ export default function Scheduler() {
         actionComplete={onActionComplete}
         
         // Enable interaction features
-        allowSelecting={true}
-        allowResizing={true}
-        allowDragging={true}
+        //allowSelecting={true} //nao existe
+        //allowResizing={true} // default já é true
+        //allowDragging={true} //não existe, tem o allowDragAndDrop
       >
         <Inject services={[
           Day, 
@@ -120,7 +120,7 @@ export default function Scheduler() {
           WorkWeek, 
           Month, 
           Agenda,
-          DialogModule,
+          //DialogModule,
           DragAndDrop,
           Resize
         ]} />

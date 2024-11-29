@@ -10,6 +10,7 @@ import {
   WorkWeek,
   Month,
   Agenda,
+  DragAndDrop,
 } from "@syncfusion/ej2-react-schedule";
 
 // Loader para buscar os eventos do banco de dados
@@ -101,7 +102,7 @@ export default function Calendario() {
         }}
         actionComplete={handleActionComplete}
       >
-        <Inject services={[Day, Week, WorkWeek, Month, Agenda]} />
+        <Inject services={[Day, Week, WorkWeek, Month, Agenda, DragAndDrop]} />
       </ScheduleComponent>
 
       <label>Definir lembrete (minutos antes):</label>

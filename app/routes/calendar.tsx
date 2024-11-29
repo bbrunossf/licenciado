@@ -61,7 +61,7 @@ export const loader: LoaderFunction = async () => {
 
 export default function Calendar() {
   const { events } = useLoaderData<LoaderData>();
-  console.dir (Calendar.name)
+  //console.dir (Calendar.name)
 
   const eventSettings: EventSettingsModel = {
     dataSource: events,
