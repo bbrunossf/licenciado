@@ -13,10 +13,31 @@ generator client {
 }
 
 model Evento {
-  id             Int      @id() @default(autoincrement())
-  subject        String
-  startTime      DateTime @default(now())
-  endTime        DateTime
-  IsAllDay       Boolean
-  recurrenceRule String
+  id                  Int             @id() @default(autoincrement())
+  subject             String
+  startTime           DateTime        @default(now())
+  endTime             DateTime
+  IsAllDay            Boolean         @default(false)
+  recurrenceRule      String?
+  recurrenceException String?
+  recurrenceId        String?
+  description         String?
+  resources           EventResource[]
+}
+
+model Resource {
+  id          Int             @id() @default(autoincrement())
+  name        String
+  description String?
+  event       EventResource[]
+}
+
+model EventResource {
+  id         Int      @id() @default(autoincrement())
+  eventId    Int
+  resourceId Int
+  event      Evento   @relation(fields: [eventId], references: [id])
+  resource   Resource @relation(fields: [resourceId], references: [id])
+
+  @@unique([eventId, resourceId])
 }

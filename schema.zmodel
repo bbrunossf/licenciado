@@ -18,6 +18,31 @@ model Evento {
   subject String
   startTime DateTime @default(now())
   endTime DateTime
-  IsAllDay  Boolean 
-  recurrenceRule String  
+  IsAllDay  Boolean @default (false)
+  recurrenceRule String?
+  recurrenceException String?
+  recurrenceId String?
+  description String?
+  //resources Resource[] @relation("EventResource")
+  resources EventResource[] // Relacionamento com a tabela intermediária
+
+}
+
+model Resource {
+  id Int @id @default(autoincrement())
+  name String
+  description String?
+  //events Evento[] @relation("EventResource")
+  event EventResource[] // Relacionamento com a tabela intermediária
+
+}
+
+model EventResource{
+  id Int @id @default(autoincrement())
+  eventId Int
+  resourceId Int
+  event Evento @relation(fields: [eventId], references: [id])
+  resource Resource @relation(fields: [resourceId], references: [id])
+
+  @@unique([eventId, resourceId])
 }
