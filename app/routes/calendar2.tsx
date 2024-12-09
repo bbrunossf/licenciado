@@ -44,7 +44,8 @@ export const action = async ({ request }) => {
   const endTime = formData.get("endTime");
   const actionType = formData.get("actionType");
   const id = formData.get("Id");
-
+  const description = formData.get("Description");
+  const isAllDay = formData.get("IsAllDay")  === 'true';
   // Validação dos dados
   if (!subject || !startTime || !endTime) {
     return json({ error: "Dados inválidos" }, { status: 400 });
@@ -58,8 +59,9 @@ export const action = async ({ request }) => {
             subject: subject.toString(),
             startTime: new Date(startTime.toString()),
             endTime: new Date(endTime.toString()),
-            IsAllDay: false,
+            IsAllDay: isAllDay,
             recurrenceRule: 'none',
+            description: description.toString() || '',
           }
         });
         return json(newEvent);
@@ -70,8 +72,9 @@ export const action = async ({ request }) => {
           subject: subject.toString(),
           startTime: new Date(startTime.toString()),
           endTime: new Date(endTime.toString()),
-          IsAllDay: false,
+          IsAllDay: isAllDay,
           recurrenceRule: 'none',
+          description: description.toString() || '',
         }
       });
       return json(updatedEvent);
@@ -146,7 +149,8 @@ export default function Scheduler() {
       formData.append("startTime", targetEvent.StartTime);
       formData.append("endTime", targetEvent.EndTime);
       formData.append("Id", targetEvent.Id);      
-
+      formData.append("Description", targetEvent.Description);
+      formData.append("IsAllDay", targetEvent.IsAllDay);
       // Envia para a rota de ação
       try {
         const response = await fetch('/calendar2', {
@@ -174,11 +178,13 @@ return (
           Subject: event.subject,
           StartTime: event.startTime,
           EndTime: event.endTime,
+          Description: event.description,
+          IsAllDay: event.IsAllDay,
         }))
       }}
       locale='pt'
        currentView='Month'
-       group={group}
+       //group={group}
       // Manipula todas as ações (criar, atualizar, excluir)
       actionComplete={onActionComplete}
     >
@@ -211,7 +217,7 @@ return (
     </ScheduleComponent>   
 
     {/* Hidden RecurrenceEditor for handling recurrence rule generation */}
-      <RecurrenceEditorComponent id='RecurrenceEditor' />
+      {/* <RecurrenceEditorComponent id='RecurrenceEditor' /> */}
 
   </div>
 );

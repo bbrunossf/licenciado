@@ -1,0 +1,25 @@
+.property-panel-section {
+    border: 1px solid #ccc;
+    padding: 16px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+  }
+  .property-panel-header {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 12px;
+  }
+  .property-panel-content {
+    font-size: 14px;
+  }
+  
+  /* Classes dinâmicas para recursos */
+.resource-checkbox {
+  margin: 10px 0;
+  padding: 5px;
+}
+  
+  /* Você pode adicionar cores dinamicamente via JavaScript ou criar classes para cada recurso */
+.resource-1 { color: #ea7a57; }
+.resource-2 { color: #df5286; }
+.resource-3 { color: #865fcf; }

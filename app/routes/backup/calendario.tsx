@@ -100,6 +100,8 @@ export default function Calendario() {
             EndTime: event.endTime,
           })),
         }}
+        locale='pt'
+       currentView='Month'
         actionComplete={handleActionComplete}
       >
         <Inject services={[Day, Week, WorkWeek, Month, Agenda, DragAndDrop]} />
