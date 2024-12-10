@@ -24,7 +24,7 @@ model Evento {
   recurrenceId String?
   description String?
   //resources Resource[] @relation("EventResource")
-  resources EventResource[] // Relacionamento com a tabela intermediária
+  EventResource EventResource[] // Relacionamento com a tabela intermediária
 
 }
 
@@ -33,7 +33,7 @@ model Resource {
   name String
   description String?
   //events Evento[] @relation("EventResource")
-  event EventResource[] // Relacionamento com a tabela intermediária
+  EventResource EventResource[] // Relacionamento com a tabela intermediária
 
 }
 

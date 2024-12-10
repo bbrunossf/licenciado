@@ -22,14 +22,14 @@ model Evento {
   recurrenceException String?
   recurrenceId        String?
   description         String?
-  resources           EventResource[]
+  EventResource       EventResource[]
 }
 
 model Resource {
-  id          Int             @id() @default(autoincrement())
-  name        String
-  description String?
-  event       EventResource[]
+  id            Int             @id() @default(autoincrement())
+  name          String
+  description   String?
+  EventResource EventResource[]
 }
 
 model EventResource {

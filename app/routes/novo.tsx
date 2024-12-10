@@ -3,6 +3,10 @@
 //RecurrenceID, Recurrence Rule, isAllDay,
 // subject, startTime, endTime
 
+//mostra todos os eventos; filtro pelo checkbox não está funcionando
+// tive que fazer o mapeamento no eventSettings mesmo fazendo o mapeamento no loader
+//
+
 import { useEffect, useRef } from 'react';
 import { extend } from '@syncfusion/ej2-base';
 import { Query, Predicate } from '@syncfusion/ej2-data';
@@ -14,7 +18,8 @@ import { useLoaderData } from "@remix-run/react";
 import React from 'react';
 import { 
   ScheduleComponent,   
-  Month, 
+  Month,
+  Week,
   Agenda, 
   Inject,
   DragAndDrop,
@@ -29,7 +34,7 @@ import { CheckBoxComponent, ChangeEventArgs } from '@syncfusion/ej2-react-button
 
 import PropertyPane from "~/components/PropertyPane";
 import '../resources.css'; // dá a cor dos recursos
-import * as dataSource from '../dados/datasource.json';
+//import * as dataSource from '../dados/datasource.json';
 
 // trazer a função action para lidar com operações CRUD com o banco de dados
 
@@ -43,24 +48,36 @@ export const loader: LoaderFunction = async () => {
           //color: true
         }
       });
-      console.log(resources);
+      //console.log("recursos", resources);
 
       const data = await prisma.evento.findMany();
-      console.log("data", data);
+      //console.log("data na função loader", data);
       
   
-      // Formatando os dados para corresponder à estrutura esperada
+      // Formatando os dados dos recursos para corresponder à estrutura esperada
       const resourceData = resources.map(resource => ({
         Text: resource.name,
         Id: resource.id,
         //Color: resource.color
       }));
       console.log("resourceData", resourceData);
+
+      // Formatando os dados dos eventos para corresponder à estrutura esperada
+      const eventos = data.map(evento => ({
+        subject: evento.subject,
+        startTime: new Date(evento.startTime.toString()),
+        endTime: new Date(evento.endTime.toString()),
+        isAllDay: evento.IsAllDay,
+        recurrenceRule: 'none',
+        description: evento.description || '',        
+        
+      }));
+      console.log("eventos", eventos);
   
       return json({
         title: "Configurações x",
         resourceData,
-        data
+        data: eventos
       });
     } catch (error) {
       console.error("Erro ao carregar recursos:", error);
@@ -77,6 +94,7 @@ export default function SchedulePage() {
     //const { title } = useLoaderData();
     const { title, resourceData, data } = useLoaderData<typeof loader>();
     let scheduleObj = useRef<ScheduleComponent>(null);
+    console.log("data recebido no componente", data);
     
     // Criar refs dinamicamente para cada recurso
     const checkboxRefs = useRef<{ [key: string]: CheckBoxComponent | null }>({});
@@ -100,53 +118,30 @@ export default function SchedulePage() {
     }
 
 
-    // let scheduleObj = useRef<ScheduleComponent>(null);
-    // let ownerOneObj = useRef<CheckBoxComponent>(null);
-    // let ownerTwoObj = useRef<CheckBoxComponent>(null);
-    // let ownerThreeObj = useRef<CheckBoxComponent>(null);
-
-    // // Criar refs dinamicamente para cada recurso
-    // const checkboxRefs = useRef<{ [key: string]: CheckBoxComponent | null }>({});
-
-
-    // //const data: Record<string, any>[] = extend([], (dataSource as Record<string, any>).resourceSampleData, null, true) as Record<string, any>[];
-    // const data: Record<string, any>[] = extend([], 
-    //     (dataSource as Record<string, any>).resourceSampleData, 
-    //     null, 
-    //     true
-    //   ) as Record<string, any>[];
-
-    // // const resourceData: Record<string, any>[] = [
-    // //     { Text: 'Margaret', Id: 1, Color: '#ea7a57' },
-    // //     { Text: 'Robert', Id: 2, Color: '#df5286' },
-    // //     { Text: 'Laura', Id: 3, Color: '#865fcf' }
-    // // ];
-
-    // const onChange = (): void => {
-    //     let predicate: Predicate;
-    //     let checkBoxes: CheckBox[] = [ownerOneObj.current, ownerTwoObj.current, ownerThreeObj.current];
-    //     checkBoxes.forEach((checkBoxObj: CheckBox) => {
-    //         if (checkBoxObj.checked) {
-    //             if (predicate) {
-    //                 predicate = predicate.or('OwnerId', 'equal', parseInt(checkBoxObj.value, 10));
-    //             } else {
-    //                 predicate = new Predicate('OwnerId', 'equal', parseInt(checkBoxObj.value, 10));
-    //             }
-    //         }
-    //     });
-    //     scheduleObj.current.eventSettings.query = new Query().where(predicate);
-    //}
+    
 
   
     return (   
         <div style={{ display: "flex", gap: "5px" }}>
         <div style={{ flex: 3 }}>          
-        <ScheduleComponent cssClass='resource' 
+        <ScheduleComponent 
                 width='80%' 
                 height='650px' 
-                selectedDate={new Date(2021, 5, 6)} 
+                selectedDate={new Date(2024, 12, 6)} 
+                locale='pt'
+                currentView='Month'
                 ref={scheduleObj} 
-                eventSettings={{ dataSource: data }} >
+                eventSettings={{ 
+                  dataSource: data.map(event => ({
+                    Id: event.id,
+                    Subject: event.subject,
+                    StartTime: event.startTime,
+                    EndTime: event.endTime,
+                    Description: event.description,
+                    IsAllDay: event.IsAllDay,
+                  }))
+                }}
+                >
 
                 <ResourcesDirective>
                     <ResourceDirective 
@@ -161,12 +156,17 @@ export default function SchedulePage() {
                     />
                 </ResourcesDirective>
                 <ViewsDirective>
-                    <ViewDirective option='Month' />
-                </ViewsDirective>
-                <Inject services={[Month]} />
+                <ViewDirective option='Day' />
+                <ViewDirective option='Week' />
+                <ViewDirective option='WorkWeek' />
+                <ViewDirective option='Month' />
+                <ViewDirective option='Agenda' />
+                <ViewDirective option='TimelineDay' />
+                <ViewDirective option='TimelineMonth' />
+              </ViewsDirective>
+                <Inject services={[Month, Week, Agenda]} />
         </ScheduleComponent>  
-        </div>
-
+        </div>        
         <div style={{ flex: 1 }}>
             <PropertyPane title={title}>
                 <table id='property' title='Properties' className='property-panel-table' >
@@ -178,7 +178,7 @@ export default function SchedulePage() {
                                                 ref={(el) => checkboxRefs.current[`resource-${resource.Id}`] = el}
                                                 value={resource.Id.toString()}
                                                 id={`resource-${resource.Id}`}
-                                                cssClass={`resource-${resource.Id}`}
+                                                //cssClass={`resource-${resource.Id}`}
                                                 checked={true}
                                                 label={resource.Text}
                                                 change={onChange}
