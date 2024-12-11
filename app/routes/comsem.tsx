@@ -52,19 +52,121 @@ export const loader: LoaderFunction = async () => {
     return transformedEvents;
   };
 
+  export const action = async ({ request }) => {
+    const formData = await request.formData();
+    
+    // Log para verificar os dados recebidos
+    console.log("Dados recebidos:", Object.fromEntries(formData.entries()));
+  
+    const subject = formData.get("subject");
+    const startTime = formData.get("startTime");
+    const endTime = formData.get("endTime");
+    const actionType = formData.get("actionType");
+    const id = formData.get("Id");
+    const description = formData.get("Description");
+    const isAllDay = formData.get("IsAllDay")  === 'true';
+    // Validação dos dados
+    if (!subject || !startTime || !endTime) {
+      return json({ error: "Dados inválidos" }, { status: 400 });
+    }
+  
+    try {
+      switch (actionType) {
+        case 'create':
+          const newEvent = await prisma.evento.create({
+            data: {
+              subject: subject.toString(),
+              startTime: new Date(startTime.toString()),
+              endTime: new Date(endTime.toString()),
+              IsAllDay: isAllDay,
+              recurrenceRule: 'none',
+              description: description.toString() || '',
+            }
+          });
+          return json(newEvent);
+        case 'update':
+        const updatedEvent = await prisma.evento.update({
+          where: { id: parseInt(id, 10) },
+          data: {
+            subject: subject.toString(),
+            startTime: new Date(startTime.toString()),
+            endTime: new Date(endTime.toString()),
+            IsAllDay: isAllDay,
+            recurrenceRule: 'none',
+            description: description.toString() || '',
+          }
+        });
+        return json(updatedEvent);
+        case 'delete':
+        const deletedEvent = await prisma.evento.delete({
+          where: { id: parseInt(id, 10) }
+        });
+        return json(deletedEvent);
+        // Outros casos (update, delete) podem ser tratados similarmente
+        default:
+          return json({ error: "Ação não reconhecida" }, { status: 400 });
+        }            
+    } catch (error) {
+      console.error("Erro ao processar evento:", error);
+      return json({ error: "Erro ao processar evento" }, { status: 500 });
+    } finally {
+      await prisma.$disconnect();
+    }
+  };    
+
 export default function SchedulePage() {
     const  events  = useLoaderData<typeof loader>();    
     console.log("dados que chegam no default", events);
 
-    const eventSettings: EventSettingsModel = {
-        dataSource: events,
-        fields: {
-          id: "id",
-          subject: { name: "subject" },
-          startTime: { name: "startTime" },
-          endTime: { name: "endTime" },
-        },
-      };
+    
+    
+    const onActionComplete = async (args) => {
+    if (args.requestType === 'eventCreated' || 
+        args.requestType === 'eventChanged' || 
+        args.requestType === 'eventRemoved') {    
+        // Identificação dinâmica do registro do evento
+        const targetEvent = 
+        args.requestType === 'eventCreated' ? args.addedRecords[0] :
+        args.requestType === 'eventChanged' ? args.changedRecords[0] :
+        args.requestType === 'eventRemoved' ? args.deletedRecords[0] :
+        null;
+
+        console.log("Tipo de Ação:", args.requestType);
+        console.log("Evento Processado:", targetEvent);
+
+        // Verifica se o evento existe
+        if (targetEvent) {
+        const formData = new FormData();
+        
+        // Map Syncfusion event data to form data
+        formData.append('actionType', 
+        args.requestType === 'eventCreated' ? 'create' :
+        args.requestType === 'eventChanged' ? 'update' :
+        'delete'
+        );
+        formData.append("subject", targetEvent.Subject);
+        formData.append("startTime", targetEvent.StartTime);
+        formData.append("endTime", targetEvent.EndTime);
+        formData.append("Id", targetEvent.Id);      
+        formData.append("Description", targetEvent.Description);
+        formData.append("IsAllDay", targetEvent.IsAllDay);
+        // Envia para a rota de ação
+        try {
+        const response = await fetch('/comsem', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error('Falha ao sincronizar evento');
+        }
+        } catch (error) {
+        console.error("Erro ao sincronizar evento:", error);
+        // Opcional: Adicionar tratamento de erro para o usuário
+        }
+    }
+    }
+};    
         
   
     return (   
@@ -76,7 +178,17 @@ export default function SchedulePage() {
                     selectedDate={new Date(2024, 12, 6)} 
                     locale='pt'
                     currentView='Month'                    
-                    eventSettings={eventSettings}                
+                    eventSettings={{ 
+                        dataSource: events.map(event => ({
+                          Id: event.id,
+                          Subject: event.subject,
+                          StartTime: event.startTime,
+                          EndTime: event.endTime,
+                          Description: event.description,
+                          IsAllDay: event.IsAllDay,
+                        }))
+                      }}
+                    actionComplete={onActionComplete}                
                 >
                     
                 <ViewsDirective>
